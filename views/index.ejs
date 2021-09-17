@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+
+    <title>Admin page</title>
+  </head>
+  <body>
+    <h1 class="text-center">Add Employ</h1>
+    <div id="message">
+      
+    </div>
+
+
+
+
+    <form class="container col-lg-6">
+       <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" name="name" class="form-control" id="name" >
+  </div>
+  <div class="mb-3">
+    <label for="exampleInputEmail1" class="form-label">Email address</label>
+    <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+  </div>
+  <div class="mb-3">
+    <label for="exampleInputPassword1" class="form-label">Password</label>
+    <input type="password" name="password" class="form-control" id="exampleInputPassword1">
+  </div>
+     <div class="mb-3">
+    <label for="Designation" class="form-label">Designation</label>
+    <input type="text" name="designation" class="form-control" id="Designation" >
+  </div>
+
+       <div class="mb-3">
+    <label for="Band" class="form-label">Band</label>
+    <input type="text" name="band" class="form-control" id="Band" >
+  </div>
+
+       <div class="mb-3">
+    <label for="ReportingManager" class="form-label">Reporting Manager</label>
+    <input type="text" name="reporting_manager" class="form-control" id="ReportingManager" >
+  </div>
+       <div class="mb-3">
+    <label for="AllocatedProject" class="form-label">Allocated Project</label>
+    <input type="text" name="allocated_project" class="form-control" id="AllocatedProject" >
+  </div>
+  <button type="submit" class="btn btn-primary" id="submitbtn">Submit</button>
+</form>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+
+ <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+ <script type="text/javascript">
+   document.getElementById('submitbtn').addEventListener("click",AddEmploy);
+
+   function AddEmploy(e)
+   {
+    e.preventDefault()
+    var list =Array.from(document.querySelectorAll('input'))
+    var formdata= {}
+    list.map(elem=>{
+      formdata[elem.name]=elem.value
+    })
+
+   // console.log(...formdata)
+    axios.post('/api/add/employ',formdata).then(resp=>{
+      if(resp.data.success == 1)
+      {
+        console.log(resp.data.message)
+        document.getElementById("message").innerHTML=`<div class="alert alert-success text-center" role="alert">
+  ${resp.data.message}
+</div>`
+      }
+      else
+      {
+        console.log("error in adding employ",resp.data.message)
+               document.getElementById("message").innerHTML=`<div class="alert alert-danger text-center" role="alert">
+  ${resp.data.message}
+</div>`
+      }
+    })
+   }
+ </script>
+
+  </body>
+</html>

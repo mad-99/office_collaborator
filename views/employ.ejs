@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+
+    <title>Admin page</title>
+  </head>
+  <body>
+    <h1 class="text-center">Update Employ</h1>
+    <div id="message">
+      
+    </div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">sno</th>
+      <th scope="col">email</th>
+      <th scope="col">update</th>
+      <th scope="col">delete</th>
+    </tr>
+  </thead>
+  <tbody id="dynamic_data">
+    <% for(i=0;i<employs.length;i++) {%>
+    <tr>
+      <th scope="row"><%= i+1 %></th>
+      <td><%= employs[i].email %></td>
+      <td><button class="btn btn-sm btn-primary update" id="<%= employs[i]._id %>">update</button></td>
+      <td><button class="btn btn-sm btn-danger delete" id="<%= employs[i].email %>">delete</button></td>
+    </tr>
+    <% }%>
+
+  </tbody>
+</table>
+
+
+<!-- model starts here -->
+<!-- Button trigger modal -->
+<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+  Launch demo modal
+</button> -->
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document" id="backdrop">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+ 
+      </div>
+   <!--    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+ <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+ <script type="text/javascript">
+   // document.getElementById('submitbtn').addEventListener("click",AddEmploy);
+   Array.from(document.getElementsByClassName('update')).map(elem=>elem.addEventListener("click",updateEmploy))
+   Array.from(document.getElementsByClassName('delete')).map(elem=>elem.addEventListener("click",deleteEmploy))
+
+
+   function updateEmploy(e)
+   {
+    e.preventDefault()
+    var id= e.target.getAttribute("id")
+ 
+
+   // console.log(...formdata)
+    axios.get(`/api/search/${id}`).then(resp=>{
+      if(resp.data.success == 1)
+      {
+        document.getElementById("backdrop").style.display = "block"
+    document.getElementById("exampleModal").style.display = "block"
+    document.getElementById("exampleModal").classList.add("show")
+        console.log(resp.data,id)
+        console.log(resp.data.data)
+  document.getElementsByClassName("modal-body")[0].innerHTML = `   <form class="container col-lg-6" method="post">
+       <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" name="name" class="form-control" id="name" value=${resp.data.data.name? resp.data.data.name: ""}>
+  </div>
+  <div class="mb-3">
+    <label for="exampleInputEmail1" class="form-label">Email address</label>
+    <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value=${resp.data.data.email? resp.data.data.email : ""}>
+    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+  </div>
+
+
+       <div class="mb-3">
+    <label for="phone" class="form-label">Phone</label>
+    <input type="text" name="phone" class="form-control" id="Phone" value=${resp.data.data.phone ? resp.data.data.phone : ""}>
+  </div>
+
+      <div class="mb-3">
+    <label for="skills" class="form-label">Skills</label>
+    <input type="text" name="skills" class="form-control" id="Skills" value=${resp.data.data.skills ? resp.data.data.skills:""}>
+  </div>
+
+ 
+  <button type="submit" class="btn btn-primary" id="submitbtn">Submit</button>
+</form>`
+      }
+      else
+      {
+        console.log("error in adding employ",resp.data.message)
+               document.getElementById("message").innerHTML=`<div class="alert alert-danger text-center" role="alert">
+  ${resp.data.message}
+</div>`
+      }
+    })
+   }
+
+
+   function deleteEmploy(e)
+   {
+     e.preventDefault()
+    var id= e.target.getAttribute("id")
+
+        axios.post(`/api/delete/employ`,{email:id}).then(resp=>{
+      if(resp.data.success == 1)
+      {
+        var str=''
+        for(var i=0 ; i<resp.data.employs.length ; i++)
+        {
+          str+=` <tr>
+      <th scope="row">${i+1}</th>
+      <td>${resp.data.employs[i].email }</td>
+      <td><button class="btn btn-sm btn-primary update" id="${ resp.data.employs[i]._id}">update</button></td>
+      <td><button class="btn btn-sm btn-danger delete" id="${ resp.data.employs[i].email}">delete</button></td>
+    </tr>`
+
+        }
+
+        document.getElementById("dynamic_data").innerHTML = str
+//         `for(var x=0 ; x<${resp.data.employs.length} ; x++)
+//         {
+// <div>Hello Word ${x}</div>
+//         }`
+// location.reload()
+        
+                       document.getElementById("message").innerHTML=`<div class="alert alert-success text-center" role="alert">
+  ${resp.data.message}
+</div>`
+
+      }
+      else
+      {
+               document.getElementById("message").innerHTML=`<div class="alert alert-danger text-center" role="alert">
+  ${resp.data.message}
+</div>`
+      }
+    })
+
+
+   }
+
+   document.addEventListener("click",function(e){
+    e.preventDefault()
+      // console.log(e.target ,e.target.getAttribute("class"), "}{}{}{{}{}{{}{}{}{}}{}{}}{}{}{}}{}}}{}}{}}{}}")
+
+    if(e.target.id == "submitbtn")
+    {
+      
+          var list =Array.from(document.querySelectorAll('input'))
+    var formdata= {}
+    list.map(elem=>{
+      formdata[elem.name]=elem.value.trim()
+    })
+
+   // console.log(...formdata)
+    axios.post('/api/update/employ',formdata).then(resp=>{
+      if(resp.data.success == 1)
+      {
+        console.log(resp.data.message)
+        document.getElementById("message").innerHTML=`<div class="alert alert-success text-center" role="alert">
+  ${resp.data.message}
+</div>`
+      }
+      else
+      {
+        console.log("error in adding employ",resp.data.message)
+               document.getElementById("message").innerHTML=`<div class="alert alert-danger text-center" role="alert">
+  ${resp.data.message}
+</div>`
+      }
+    })
+    }
+    if(e.target.getAttribute("class") && e.target.getAttribute("class").includes("delete"))
+    {
+     deleteEmploy(e) 
+    }
+   })
+
+
+   document.getElementsByClassName("close")[0].addEventListener("click",function(){
+     document.getElementById("backdrop").style.display = "none"
+    document.getElementById("exampleModal").style.display = "none"
+    document.getElementById("exampleModal").classList.remove("show")
+   })
+ </script>
+
+  </body>
+</html>
