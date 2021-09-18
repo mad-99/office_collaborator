@@ -1,4 +1,4 @@
-# office_collaborator# Employee Management System
+# office_collaborator#
 <b>Technology used </b></br>
 </br>
 1 . <b> Node JS and Express JS (Backend) </b> </br>
@@ -12,6 +12,7 @@
 <b> Code Editor used : Sublime text </b></br>
 
 <b>Admin Credentials </b>
+</br>
 Email : admin404@gmail.com
 password:12345
 
@@ -19,8 +20,9 @@ password:12345
 </br>
 </br>
 <b>Employ Credentials </b>
+</br>
 Email : employ404@gmail.com
-password:12345
+password: 12345
 
 
 
