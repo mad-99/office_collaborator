@@ -10,23 +10,24 @@
 
     <title>Welcome !</title>
   </head>
-  <body>
+  <body style="background: linear-gradient(to right,#E4D8DC,#C9CCD5,#93B5C6);">
     <% if(!req.session.auth_user) {%>
      <div class="container">
+      <h4 class="text-center text-primary my-4">Welcome to office collaborator</h4>
           <div id="message">
       
     </div>
-     <form class="col-lg-7" method="post">
+     <form class="col-lg-7 mx-auto" method="post">
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
     <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+    <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
   </div>
   <div class="form-group">
     <label for="exampleInputPassword1">Password</label>
     <input type="password" class="form-control" name="password" id="exampleInputPassword1" placeholder="Password">
   </div>
-
+  <label for="role">Role</label>
   <select class="form-control mb-4" name="role" id="role">
   <option>Select role</option>
   <option value="admin">Admin</option>
@@ -53,8 +54,10 @@
     })
 
     formdata["role"]=role
-
-    axios.post('/api/employ/login',formdata).then(resp=>{
+    console.log("role is ==============",role)
+    if(role == "employ")
+    {
+          axios.post('/api/employ/login',formdata).then(resp=>{
       if(resp.data.success == 1)
       {
         window.location="/update/profile"
@@ -66,6 +69,24 @@
 </div>`
       }
     })
+    }
+    else
+    {
+                axios.post('/api/admin/login',formdata).then(resp=>{
+      if(resp.data.success == 1)
+      {
+        window.location="/add/employ"
+      }
+      else
+      {
+                       document.getElementById("message").innerHTML=`<div class="alert alert-danger text-center" role="alert">
+  ${resp.data.message}
+</div>`
+      }
+    })
+    }
+
+
 
       })
     </script>

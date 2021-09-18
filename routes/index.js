@@ -6,6 +6,7 @@ var Admin=require('../models/Admin');
 mongoose.connect("mongodb+srv://admin:Maheshwari%401002@kietproject.0xeag.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",{useNewUrlParser: true,useUnifiedTopology: true}).then(()=>console.log("Conencted")).catch(err=>console.log(err));
 
 /* GET home page. */
+
 router.get('/', function(req, res) {
   if(!req.session.auth_user)
   {
@@ -14,7 +15,11 @@ router.get('/', function(req, res) {
   }
   else
   {
+    if(req.session.auth_user.role == "employ")
+    // console.log("auth user is ===================",req.session.auth_user)
     res.redirect('/update/profile')
+    else
+      res.redirect('/list/employ')
   }
 });
 
@@ -24,8 +29,12 @@ router.get('/add/employ', function(req, res) {
  
   if(req.session.auth_user && req.session.auth_user.role != "employ")
   {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Express' ,req});
   }
+  else
+{
+  res.redirect("/")
+}
 
 });
 
@@ -36,6 +45,10 @@ router.get('/list/employ',function(req,res){
   Employ.find({}).then(employs=>{
     res.render('employ',{employs})
   })
+}
+else
+{
+  res.redirect("/")
 }
   
 
@@ -75,6 +88,10 @@ return res.json({success:1,message:"Employ already exists with this email id"})
     }
   })
 }
+else
+{
+  res.redirect("/")
+}
 
 })
 
@@ -104,6 +121,10 @@ router.post('/api/update/employ',function(req,res){
     }
   })
 }
+else
+{
+  res.redirect("/")
+}
 })
 
 
@@ -126,6 +147,10 @@ router.post("/api/delete/employ",function(req,res){
       })
     }
   })
+}
+else
+{
+  res.redirect("/")
 }
 })
 
@@ -168,7 +193,24 @@ router.post('/api/employ/login',function(req,res){
     }  
     else
     {
-      res.json({success:0,message:"Error occured at the time of login"})
+      res.json({success:0,message:"Please enter valid email  and password"})
+
+    }
+  })
+
+})
+
+router.post('/api/admin/login',function(req,res){
+  var {email,password,role} =req.body
+  Admin.findOne({email:email.trim(),password:password.trim()},{password:0}).then(employ=>{
+    if(employ)
+    {
+      req.session.auth_user=employ
+      res.json({success:1,message:"User logged in successfully"})
+    }  
+    else
+    {
+      res.json({success:0,message:"Please enter valid email  and password"})
 
     }
   })
@@ -182,15 +224,15 @@ delete req.session.auth_user;
 
 
 router.post('/api/update/user',function(req,res){
-  var {name,skills,password,phone,address}= req.body
+  var {name,skills,phone,address}= req.body
   if(req.session.auth_user && req.session.auth_user.email)
   {
 
-   Employ.findOne({email,name}).then(employ=>{
+   Employ.findOne({email: req.session.auth_user.email}).then(employ=>{
     if(employ)
     {
       employ.name=name
-      employ.email = email
+      // employ.email = email
       employ.phone=phone
       employ.skills=skills
       employ.address=address
@@ -230,7 +272,7 @@ router.get('/api/search/:id',function(req,res){
 })
 
 
-router.get('/api/serach/:name',function(req,res){
+router.get('/api/search/name/:name',function(req,res){
   Employ.find({name:req.params.name.trim()}).then(employ=>{
     if(employ)
     {
@@ -243,7 +285,7 @@ router.get('/api/serach/:name',function(req,res){
   })
 })
 
-router.get('/api/serach/:project',function(req,res){
+router.get('/api/search/allocated_project/:project',function(req,res){
   Employ.find({allocated_project:req.params.project.trim()}).then(employ=>{
     if(employ)
     {
@@ -256,7 +298,7 @@ router.get('/api/serach/:project',function(req,res){
   })
 })
 
-router.get('/api/serach/:location',function(req,res){
+router.get('/api/search/address/:location',function(req,res){
   Employ.find({address:req.params.location.trim()}).then(employ=>{
     if(employ)
     {
@@ -269,7 +311,7 @@ router.get('/api/serach/:location',function(req,res){
   })
 })
 
-router.get('/api/serach/:designation',function(req,res){
+router.get('/api/search/designation/:designation',function(req,res){
   Employ.find({designation:req.params.designation.trim()}).then(employ=>{
     if(employ)
     {

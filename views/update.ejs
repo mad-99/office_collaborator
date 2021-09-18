@@ -10,10 +10,37 @@
 
     <title>Update Employ Profile !</title>
   </head>
-  <body>
+  <body style="background: linear-gradient(to right,#E4D8DC,#C9CCD5,#93B5C6);">
     <% if(req.session.auth_user) {%>
-     <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+  <a class="navbar-brand" href="/">Office Collaborator</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/r">Home <span class="sr-only">(current)</span></a>
+      </li>
+<!--       <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li> -->
+
+    </ul>
+    <!-- <form class="form-inline my-2 my-lg-0"> -->
+    
       <button class="btn btn-secondary float-right" id="logout">Logout</button>
+    <!-- </form> -->
+  </div>
+</nav>
+     <div class="container">
+      <ul class="list-group my-3">
+  <li class="list-group-item">Reporting Manager :- <%= resp.data.data? resp.data.data.reporting_manager: "" %> </li>
+
+</ul>
+  <h4 class="text-center text-secondary">Update profile </h4>
+     
           <div id="message">
       
     </div>
@@ -40,8 +67,46 @@
   </div>
 
  
-  <button type="submit" class="btn btn-primary" id="submitbtn">Submit</button>
+  <button type="submit" class="btn btn-secondary" id="submitbtn">Submit</button>
 </form>
+<hr>
+<div class="mx-3 mt-5 ">
+  <h4 class="text-center text-secondary">Search employs </h4>
+  <form method="post">  
+        <label for="search">Search by</label>
+  <select class="form-control mb-4" name="search" id="search">
+  <!-- <option>Search by</option> -->
+  <option value="name">Name</option>
+  <option value="allocated_project">project</option>
+  <option value="address">Location</option>
+  <option value="designation">Designation</option>
+
+
+</select>
+ <label for="srchtext" class="form-label" id="dynamic_label">Enter Employ Name </label>
+ <input type="text" name="srchtext" id="srchtext" class="form-control">
+
+  <button type="submit" class="btn btn-secondary mt-4" id="srchbtn">Search</button>
+  </form>
+
+
+</div>
+<div >
+  <table class="table table-bordered table-responsive text-center" >
+  <thead>
+    <tr>
+      <th scope="col">sno</th>
+      <th scope="col">name</th>
+      <th scope="col">email</th>
+      <th scope="col">view Profile</th>
+    </tr>
+  </thead>
+  <tbody id="searched_employ">
+    
+  </tbody>
+</table>
+</div>
+
     </div>
     <% } else{ %>
     <script type="text/javascript">
@@ -55,13 +120,13 @@
       document.getElementById('submitbtn').addEventListener("click",function(e){
         e.preventDefault()
                 var list =Array.from(document.querySelectorAll('input'))
-                var role=document.getElementById('role').value
+                // var role=document.getElementById('role').value
     var formdata= {}
     list.map(elem=>{
       formdata[elem.name]=elem.value.trim()
     })
 
-    formdata["role"]=role
+    // formdata["role"]=role
 
     axios.post('/api/update/user',formdata).then(resp=>{
       if(resp.data.success == 1)
@@ -85,9 +150,70 @@
         // e.preventDefault()
         axios.get('/api/user/logout').then((data)=>{
           console.log(data.data)
-          location.reloaad()
-          window.location="/"
+          location.reload()
+          // window.location="/"
         })
+      })
+
+      document.getElementById('search').addEventListener("change",function(e){
+        var val= e.target.value
+        if(val == "allocated_project")
+        {
+          document.getElementById("dynamic_label").innerHTML= "Enter Project Name"
+        }
+          if(val == "name")
+        {
+          document.getElementById("dynamic_label").innerHTML= "Enter Employ Name "
+        }
+        if(val == "designation")
+        {
+          document.getElementById("dynamic_label").innerHTML= "Enter Employ Designation "
+
+        }
+           if(val == "address")
+        {
+          document.getElementById("dynamic_label").innerHTML= "Enter Employ Location "
+
+        }
+        console.log(val)
+      })
+
+      document.getElementById('srchbtn').addEventListener("click",function(e){
+        e.preventDefault()
+        var val = document.getElementById('search').value;
+        var text=document.getElementById('srchtext').value
+        axios.get(`/api/search/${val}/${text}`).then(resp=>{
+if(resp.data.data.length > 0)
+{
+        console.log(resp.data)
+          var str=''
+          for(var i=0;i<resp.data.data.length;i++)
+          {
+            str+=`  <tr>
+      <th scope="row">${i+1}</th>
+      <td>${resp.data.data[i].name}</td>
+      <td>${resp.data.data[i].email}</td>
+      <td><button type="button" class="btn btn-secondary btn-sm" id="view_profile" data-email="${resp.data.data[i].email}">View Profile</button></td>
+    </tr>`
+          }
+
+          document.getElementById("searched_employ").innerHTML = str
+}
+else
+{
+          document.getElementById("searched_employ").innerHTML = "<h5> No data found</h5>"
+
+}
+    
+        })
+      })
+
+      document.addEventListener("click",function(e){
+        if(e.target.id == "view_profile")
+        {
+          var email =e.target.getAttribute("data-email")
+
+        }
       })
     </script>
 
